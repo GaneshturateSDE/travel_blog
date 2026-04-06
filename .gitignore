@@ -15,10 +15,13 @@ db.sqlite3
 *.sqlite3
 
 # 🔐 Media Files (user uploads)
-/media/photos/
-/media/profile_pic/
-/media/videos/
-!/media/.gitkee
+/media/photos/*
+/media/profile_pic/*
+/media/videos/*
+!/media/.gitkeep
+!/media/photos/.gitkeep
+!/media/profile_pic/.gitkeep
+!/media/videos/.gitkeep
 # 🔐 Static Images (your custom folder)
 static/Imgs/
 
