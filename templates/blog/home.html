@@ -1,0 +1,152 @@
+{% extends 'blog/index.html' %}
+{% load static %}
+
+{% block static %}Travel Blog-Home{% endblock %}
+
+{% block content %}
+
+<div class="bg-blue-50">
+
+    {% include 'blog/message.html' %}
+
+    <!-- HERO SECTION -->
+    <div class="relative h-screen overflow-hidden">
+
+        <!-- Video -->
+        <video autoplay muted loop playsinline
+               class="absolute top-0 left-0 w-full h-full object-cover">
+            <source src="{% static 'Imgs/nature.mp4' %}" type="video/mp4">
+        </video>
+
+        <!-- Overlay -->
+        <div class="absolute inset-0 bg-black/50 flex items-center justify-center text-center px-4">
+            <div class="text-white max-w-3xl">
+                <h1 class="text-3xl md:text-5xl font-bold mb-4 leading-tight">
+                    Every place holds its own story
+                </h1>
+
+                <p class="text-lg md:text-xl mb-6 text-gray-200">
+                    Discover journeys, experiences, and untold travel stories from around the world.
+                </p>
+
+                <a href="{% url 'blogs' %}"
+                   class="inline-block px-6 py-3 bg-blue-600 rounded-lg text-white shadow hover:bg-blue-700 transition">
+                    Explore Blogs →
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- FEATURE SECTION 1 -->
+    <div class="max-w-6xl mx-auto py-16 px-4 grid md:grid-cols-2 gap-10 items-center">
+
+        <img src="{% static 'Imgs/harrier.jpg' %}"
+             class="w-full rounded-xl shadow-lg hover:scale-105 transition duration-500">
+
+        <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-blue-700 mb-4">
+                Harihar Fort Adventure
+            </h2>
+
+            <p class="text-gray-600 mb-3">
+                A historic fort in Nashik known for its steep rock-cut staircase and thrilling trekking experience.
+            </p>
+
+            <ul class="text-gray-600 space-y-2 text-sm">
+                <li>✔ Unique vertical staircase</li>
+                <li>✔ Moderate to challenging trek</li>
+                <li>✔ Historical significance</li>
+            </ul>
+        </div>
+
+    </div>
+
+
+    <!-- FEATURE SECTION 2 -->
+    <div class="max-w-6xl mx-auto py-16 px-4 grid md:grid-cols-2 gap-10 items-center">
+
+        <div>
+            <h2 class="text-2xl md:text-3xl font-bold text-blue-700 mb-4">
+                Goa Beaches 🌊
+            </h2>
+
+            <p class="text-gray-600 mb-3">
+                From party vibes in North Goa to peaceful retreats in South Goa — there’s something for everyone.
+            </p>
+
+            <ul class="text-gray-600 space-y-2 text-sm">
+                <li>✔ Best for nightlife & parties</li>
+                <li>✔ Peaceful relaxation spots</li>
+                <li>✔ Water sports & beach shacks</li>
+            </ul>
+        </div>
+
+        <img src="{% static 'Imgs/beach.webp' %}"
+             class="w-full rounded-xl shadow-lg hover:scale-105 transition duration-500">
+
+    </div>
+
+
+    <!-- GALLERY PREVIEW -->
+    {% comment %} <div class="max-w-6xl mx-auto py-10 px-4">
+        <h2 class="text-2xl font-bold text-blue-700 mb-6 text-center">
+            Travel Moments 📸
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% for image in images %}
+            <a href="{% url 'post_detail' image.post.pk %}" class="overflow-hidden rounded-lg">
+                <img src="{{ image.images.url }}"
+                     class="w-full h-40 object-cover hover:scale-105 transition">
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+
+    <!-- BLOG PREVIEW -->
+    <div class="max-w-6xl mx-auto py-10 px-4">
+
+        <h2 class="text-2xl font-bold text-blue-700 mb-6 text-center">
+            Latest Blogs ✍️
+        </h2>
+
+        <div class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            {% for post in posts %}
+            <div class="bg-white rounded-xl shadow-md hover:shadow-xl transition overflow-hidden">
+
+                <img src="{{ post.images.first.images.url }}"
+                     class="w-full h-52 object-cover">
+
+                <div class="p-4">
+                    <h4 class="text-lg font-bold text-gray-800">
+                        {{ post.title }}
+                    </h4>
+
+                    <p class="text-sm text-blue-600">
+                        {{ post.destination }} • {{ post.date }}
+                    </p>
+
+                    <p class="text-gray-600 text-sm mt-2">
+                        {{ post.description|truncatewords:15 }}
+                    </p>
+
+                    <a href="{% url 'post_detail' post.pk %}"
+                       class="inline-block mt-3 text-blue-600 font-medium hover:underline">
+                        Read More →
+                    </a>
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+
+    </div> {% endcomment %}
+
+</div>
+
+{% endblock %}

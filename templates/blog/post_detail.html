@@ -1,0 +1,169 @@
+{% extends 'blog/index.html' %}
+{% load static %}
+
+{% block static %} Travel Blog-Details {% endblock %}
+
+{% block content %}
+
+<div class="bg-blue-50 min-h-screen py-10 px-4">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6 md:p-8">
+
+        {% include 'blog/message.html' %}
+
+        <!-- Title -->
+        <h1 class="text-2xl md:text-3xl font-bold text-blue-700 mb-4 text-center">
+            {{ post_d.title }}
+        </h1>
+
+        <!-- HERO IMAGE (First Image) -->
+        {% if post_d.images.first %}
+        <div class="mb-6">
+            <img src="{{ post_d.images.first.images.url }}"
+                 class="w-full h-80 object-cover rounded-xl shadow-lg cursor-pointer"
+                 onclick="openModal('{{ post_d.images.first.images.url }}')">
+        </div>
+        {% endif %}
+
+        <!-- GALLERY (All Images) -->
+        {% if post_d.images.all %}
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+
+            {% for image in post_d.images.all %}
+            <div class="relative group cursor-pointer" onclick="openModal('{{ image.images.url }}')">
+                
+                <img src="{{ image.images.url }}"
+                     class="w-full h-40 object-cover rounded-lg shadow-md group-hover:scale-105 transition">
+
+                <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-sm font-medium transition">
+                    View
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+        {% endif %}
+
+        <!-- Destination + Date -->
+        <p class="text-center text-sm text-blue-600 font-medium mb-4">
+            {{ post_d.destination }} • {{ post_d.date }}
+        </p>
+
+        <!-- Video -->
+        {% if post_d.video %}
+        <video controls class="w-full rounded-xl shadow mb-6">
+            <source src="{{ post_d.video.url }}" type="video/mp4">
+        </video>
+        {% endif %}
+
+        <!-- Description -->
+        <p class="text-gray-700 leading-relaxed mb-6">
+            {{ post_d.description }}
+        </p>
+
+        <!-- Like Button -->
+        <form action="{% url 'like_post' post_d.pk %}" method="POST" class="mb-4">
+            {% csrf_token %}
+            {% if user in post_d.likes.all %}
+            <button class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition">
+                ❤️ Unlike ({{ post_d.total_likes }})
+            </button>
+            {% else %}
+            <button class="px-4 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition">
+                🤍 Like ({{ post_d.total_likes }})
+            </button>
+            {% endif %}
+        </form>
+
+        <!-- Back -->
+        <a href="{% url 'blog' %}"
+           class="inline-block mb-6 text-blue-600 font-medium hover:underline">
+            ← Back to Blog
+        </a>
+
+        <!-- COMMENTS -->
+        <div class="border-t pt-6">
+
+            <h3 class="text-xl font-semibold text-blue-700 mb-4">
+                Comments
+            </h3>
+
+            <!-- Comment Form -->
+            <form method="post" class="space-y-3 mb-6">
+                {% csrf_token %}
+                <div class="w-full">
+                    {{ form.content }}
+                </div>
+
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                    Post Comment
+                </button>
+            </form>
+
+            <!-- Comment List -->
+            <div class="space-y-4">
+                {% for comment in comments %}
+                <div class="bg-gray-50 p-4 rounded-lg shadow-sm">
+
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="font-semibold text-gray-800">
+                            {{ comment.user.username }}
+                        </p>
+                        <span class="text-xs text-gray-400">
+                            {{ comment.date }}
+                        </span>
+                    </div>
+
+                    <p class="text-gray-600 text-sm">
+                        {{ comment.content|linebreaks }}
+                    </p>
+
+                    {% if comment.user == request.user or request.user.is_superuser %}
+                    <a href="{% url 'delete_comment' comment.id %}"
+                       onclick="return confirm('Delete this comment?')"
+                       class="text-red-500 text-xs mt-2 inline-block hover:underline">
+                        Delete
+                    </a>
+                    {% endif %}
+
+                </div>
+                {% empty %}
+                <p class="text-gray-500">No comments yet.</p>
+                {% endfor %}
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- IMAGE MODAL -->
+<div id="imageModal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
+
+    <span onclick="closeModal()" 
+          class="absolute top-5 right-8 text-white text-3xl cursor-pointer">&times;</span>
+
+    <img id="modalImage" class="max-w-[90%] max-h-[90%] rounded-lg shadow-xl">
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+function openModal(src) {
+    const modal = document.getElementById("imageModal");
+    const img = document.getElementById("modalImage");
+
+    img.src = src;
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+function closeModal() {
+    document.getElementById("imageModal").classList.add("hidden");
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'blog/index.html' %}
+{% load static %}
+
+{% block static %} Travel Blog-Gallery {% endblock %}
+
+{% block content %}
+
+<div class="bg-blue-50 min-h-screen py-10 px-4">
+
+    <!-- Heading -->
+    <div class="max-w-6xl mx-auto text-center mb-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-blue-700">
+            Travel Gallery 📸
+        </h1>
+        <p class="text-gray-500 mt-2">
+            Explore beautiful moments shared by travelers
+        </p>
+    </div>
+
+    <!-- Gallery Grid -->
+    <div class="max-w-6xl mx-auto columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+
+        {% for image in images %}
+
+        <a href="{% url 'post_detail' image.post.pk %}" 
+           class="block overflow-hidden rounded-xl shadow-md hover:shadow-xl transition">
+
+            <img src="{{ image.images.url }}"
+                 class="w-full object-cover h-64 rounded-xl hover:scale-105 transition duration-500">
+
+        </a>
+
+        {% empty %}
+
+        <div class="text-center col-span-full py-10">
+            <p class="text-gray-500 text-lg">
+                No photos yet.
+            </p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% endblock %}

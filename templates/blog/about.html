@@ -1,0 +1,74 @@
+{% extends 'blog/index.html' %}
+{% load static %}
+
+{% block static %} About-Travel blog {% endblock %}
+
+{% block content %}
+
+<div class="bg-blue-50 min-h-screen py-10 px-4">
+    
+    <!-- Container -->
+    <div class="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        
+        <!-- Top Banner Image -->
+        <div class="w-full h-[300px] md:h-[400px] overflow-hidden">
+            <img src="{% static 'Imgs/about_img.jpg' %}" 
+                 class="w-full h-full object-cover hover:scale-105 transition duration-500">
+        </div>
+
+        <!-- Content Section -->
+        <div class="p-6 md:p-10">
+            
+            <!-- Heading -->
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-blue-600 mb-8">
+                About Travel Blog
+            </h1>
+
+            <!-- Grid Section -->
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                
+                <!-- Left Content -->
+                <div class="space-y-5 text-gray-700 leading-relaxed">
+                    
+                    <p>
+                        <span class="font-semibold text-lg text-blue-700">
+                            Travel Blog
+                        </span> is an online platform where travelers share their journeys, experiences, tips, photos, and videos about the places they visit. 
+                        The aim is to inspire, educate, and help others explore the world.
+                    </p>
+
+                    <p>
+                        Our platform allows every travel enthusiast to post their own experiences, share stunning photos and videos, and inspire others to step out and see the beauty of the world.
+                    </p>
+
+                    <div class="bg-blue-100 border-l-4 border-blue-500 p-4 rounded-lg">
+                        <p class="text-blue-800 font-semibold uppercase tracking-wide">
+                            Why Travel Blog Creative?
+                        </p>
+                    </div>
+
+                    <p>
+                        Because there are few feelings in the world that surpass the joy of clearing a treeline and emerging into a breathtaking travel environment.
+                    </p>
+
+                    <p>
+                        In the high mountains, the air is crisp and clear, and the weather constantly changes — making every moment feel alive and adventurous.
+                    </p>
+
+                </div>
+
+                <!-- Right Image -->
+                <div class="overflow-hidden rounded-xl shadow-md">
+                    <img src="{% static 'Imgs/world.jpg' %}" 
+                         class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

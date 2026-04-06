@@ -1,0 +1,1112 @@
+step1: strat project --> django-admin start project Travel_blog
+step2: srart app --> python manage.py startapp
+
+step3: In settings.py --> installed app in installed folder
+step4: create a at project level folder name as "templates".
+step5: create another folder in templates in name as blog and in this folder create your html files.
+step6. after completing all steps register templates folder inside settings.py
+
+               import os
+            TEMPLATE_DIR=os.path.join(BASE_DIR,"templates")
+
+step7: register the variable TEMPLATE_DIR inside settings.py TEMPLATES section
+            DIR:[TEMPLATE_DIR]
+
+step8: write down the business logic inside views.py file
+           def Index(request):
+                return render(request,"blog/index.html")
+
+step9: create one another file at application level name as urls.py
+
+        from django.contrib import admin
+        from django.urls import path
+        from .views import *
+
+        urlpatterns = [
+            path('admin/', admin.site.urls),
+            path('index/',Index,name="index"),
+
+step10: include app level urls file into project level urls
+
+          from django.contrib import admin
+        from django.urls import path,include
+
+
+        urlpatterns = [
+            path('admin/', admin.site.urls),
+            path('',include('blog.urls')
+
+step11: If you want to render css,js,images so crete one folder at project lavel name as static
+step12: then create one folder under static name as css and create a file name as style.css.
+step13: register the static folder inside the settings.py file and add below code
+
+        STATICFILES_DIRS = [
+        BASE_DIR / "static",
+        "/var/www/static/",
+        ]
+
+step14: go to the index.html and write above code before html tag
+
+        {% load static  %}
+
+step16:  After writing the above code next we need to link css file in heading tag, as below
+    <link rel="stylesheet" href="{% static 'css/style.css'  %}">
+
+step 17: then add bootstrap by bootstrap link
+
+step 18: inside the index.html create header and footer
+step 19: create file home.html and create home page
+step20: create another file for show the blog name as blog_page.html and put it temporary values for how
+        to display page
+
+step21: create another file name as post_detail and attach the read more button on bog page by using
+        belo tag {% url 'blog_page' %} and also here put it temporary values for how
+        to display page
+
+step22: change the database inside the setting.py and write down  below code
+
+        DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'travel_blog',
+        'USER': 'root',
+        'PASSWORD': 'admin123',
+        'HOST':'localhost',
+        'PORT':'3306',
+    }
+}
+
+step 23: and fire below two command
+        python manage.py makemigrations
+        python manage.py migrate
+
+        after fire these commands crete some tables automatically
+
+step24: create superuser by using below command
+           python manage.py createsuperuser
+
+step25: create model
+
+            from django.db import models
+
+            # Create your models here.
+            class TravelPost(models.Model):
+                title = models.CharField(max_length=250)
+                destination = models.CharField(max_length=200)
+                date = models.DateField()
+                description = models.TextField()
+                images = models.ImageField(upload_to="photos")
+
+                class Meta:
+                    verbose_name_plural = "TravelPost"
+
+step26: for image field you have need some settings inside settings.py file write down below code
+            MEDIA_URL = '/media/'
+            MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+
+            and write down below code at project lavel urls.py
+
+            from django.conf import settings
+            from django.conf.urls.static import static
+
+            from django.contrib import admin
+            from django.urls import path,include
+
+            urlpatterns = [
+                path('admin/', admin.site.urls),
+                path('',include("blog.urls"))
+            ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+            for display image on page
+
+step27: crete one folder under app level name as media for store images in these path
+
+step29: fire below two command
+        python manage.py makemigrations
+        python manage.py migrate
+
+        here in database made your table
+
+step30: register model inside the admin.py file by below code
+
+        from django.contrib import admin
+        from .models import TravelPost
+        # Register your models here.
+
+        admin.site.register(TravelPost)
+
+step31: create a post form by using model data name as post_form.html
+
+step32: for using the js  create a folder under static name as js and create a file name travel.js
+
+step33: link the javascript in main page name as  at before end of html tag index.html by using script tag
+
+        <script src="{% static 'js/travel.js' %}"></script>
+
+step34: write js code and link it on events
+
+step35: in views.py take all data or objects on blog_page from Travelpost module using like this
+
+            def Blogs(request):
+                posts = TravelPost.objects.all().order_by('-id')
+                return render(request, "blog/blog_page.html", {'posts': posts})
+
+step 36: for post_detail use
+
+           def Post_detail(request, pk):
+                post_d = get_object_or_404(TravelPost, pk=pk)
+                return render(request, "blog/post_detail.html", {'post_d': post_d})
+
+           give a id as pk
+
+step37: inside app level url register id in post_detail
+         path('post_detail<int:pk>/',Post_detail,name="post_detail"),
+
+step38: write down your business logic in views through model
+
+        def Post_blog(request):
+            if request.method == "POST":
+                title = request.POST.get("title")   --> this is name from post_form.html file
+  variable <--  destination = request.POST.get("destination")
+                date = request.POST.get("date")
+                description = request.POST.get("description")
+                images = request.FILES.get("images")
+
+
+                travelpost = TravelPost(
+                    title = title
+  this value  <--  destination = destination
+  come from        date = date,
+    model          description = description, --> variable are the same name
+                   images = images
+                )
+
+                try:
+                    travelpost.save()
+                    return redirect("blog")
+
+                except:
+                    return render(request,"blog/post_form.html")
+            return render(request,"blog/post_form.html")
+
+
+step39: in post_form write action and enctype in form tag
+        <form method="POST" action="{% url 'post_blog' %}" class="p-4 rounded shadow-sm" enctype="multipart/form-data">
+
+
+step40: put values in blog page before that brings all data in posts name variable
+
+    def Blogs(request):
+        posts = TravelPost.objects.all().order_by('-id')
+        return render(request, "blog/blog_page.html", {'posts': posts})
+
+{% extends 'blog/index.html' %}
+{% block static %}Travel Blog-blogs {% endblock %}
+
+{% load static %}
+{% block content %}
+<div class="row">
+    {% for post in posts %}
+    <div class="col-md-6 col-lg-4 mb-4 mt-3">
+        <div class="card h-100 shadow">
+            <img src="{{post.images.url}}" class="card-img-top" height="350rem">
+            <div class="card-body">
+                <h5 class="card-title">{{post.title}}</h5>
+                <p class="card-text"><strong>{{post.destination}}</strong> {{post.date}}</p>
+                <p class="card-text"> {{post.description |truncatewords:20}}</p>
+                <a href="{% url 'post_detail' post.pk %}" class="btn btn-primary">Read more</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+step41: also put values from views in post detail and brings all data in post_d of varaible name
+
+    def Post_detail(request, pk):
+        post_d = get_object_or_404(TravelPost, pk=pk)
+        return render(request, "blog/post_detail.html", {'post_d': post_d})
+
+step42: update the url for show data by id
+path('post_detail<int:pk>/',Post_detail,name="post_detail"),
+
+step43: this is a post detail before added multiple images
+
+{% extends 'blog/index.html' %}
+{% block static %} Travel Blog-Details {% endblock %}
+
+{% load static %}
+{% block content %}
+
+<div class="card shadow p-4">
+    <div class="container d-flex align-items-center justify-content-center flex-column">
+        <h2 class="mb-3">{{post_d.title}}</h2>
+        <img src="{{post_d.images.url}}" height="750rem" width="80%" class="img-fluid rounded mb-3">
+
+        <h5 class="text-muted fw-bold">{{post_d.destination}} - {{post_d.date}}</h5>
+    </div>
+    <p> {{post_d.description}}</p>
+    <a href="{% url 'blog' %}" class="btn btn-secondary mt-3">Back to Blog</a>
+
+</div>
+
+{% endblock %}
+
+step44: gallery view before added multiple images
+
+def Gallery(request):
+    posts = TravelPost.objects.only('title','images').order_by('-id')
+    return render(request,"blog/gallery.html",{'posts':posts})
+
+======================================= add multiple images ============================================
+
+# when i want multiple images per blog and display them in slider on my detail page
+
+step1:  need a separate model for images that has a ForeignKey to TravelPost.
+
+        update a model
+
+        from django.db import models
+
+        # Create your models here.
+        class TravelPost(models.Model):
+            title = models.CharField(max_length=250)
+            destination = models.CharField(max_length=200)
+            date = models.DateField()
+            description = models.TextField()
+            video = models.FileField(upload_to="videos",blank="True",null="True")
+
+            class Meta:
+                verbose_name_plural = "TravelPost"
+
+            def __str__(self):
+                return self.title
+
+
+        class TravelImage(models.Model):
+            post = models.ForeignKey(TravelPost,on_delete=models.CASCADE,related_name='images')
+            images = models.ImageField(upload_to="photos")
+
+            def __str__(self):
+                return f"Image for {self.post.title}"
+
+step2: update th post form for images
+
+<input type="file" name="images" id="images" class="form-control" accept="image/*" multiple required>
+** here add only last one multiple required
+
+step3: Update the View to Handle Multiple File Uploads
+
+def Post_blog(request):
+    if request.method == "POST":
+        title = request.POST.get("title")
+        destination = request.POST.get("destination")
+        date = request.POST.get("date")
+        description = request.POST.get("description")
+        images = request.FILES.getlist("images")
+        video = request.FILES.get("video")
+
+        try:
+            post = TravelPost.objects.create(
+                title= title,
+                destination = destination,
+                date = date,
+                description = description,
+                video = video
+            )
+
+            for img in images:
+                TravelImage.objects.create(post=post, images=img)
+
+            return redirect("blog")
+        except:
+            return render(request,"blog/post_form.html")
+    return render(request,"blog/post_form.html")
+
+step4: Update the Detail Page Template with Carousel
+       Use Bootstrap's Carousel component to display images as a slider
+
+<div class="card shadow p-4 gradient-bg" style="background: linear-gradient(to right, #48c9b0, #f1948a);">
+    <div class="container d-flex align-items-center justify-content-center flex-column">
+        <h2 class="mb-3">{{post_d.title}}</h2>
+        <!--        <img src="{{post_d.images.url}}" height="750rem" width="80%" class="img-fluid rounded mb-3">-->
+
+        {% if post_d.images.all %}
+        <div id="carouselImages" class="carousel slide mb-4" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for image in post_d.images.all %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                    <img src="{{ image.images.url }}" class="d-block"
+                         style="height: 30rem; width: 20rem object-fit: cover;">
+
+                </div>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselImages" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+        </div>
+        {% endif %}
+        <h5 class="text-muted fw-bold">{{post_d.destination}} - {{post_d.date}}</h5>
+        {% if post_d.video %}
+        <video controls width="100%" class="my-4 rounded shadow">
+            <source src="{{ post_d.video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        {% endif %}
+    </div>
+    <p> {{post_d.description}}</p>
+    <a href="{% url 'blog' %}" class="btn btn-secondary mt-3">Back to Blog</a>
+
+</div>
+
+step5: for showing or working slider add below js link in end at on index.html page before end of html tag
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+step 6: To Show the First Image of Each Post
+        Update blog page template to fetch the first image from the related TravelImage objects.
+
+after switching to a multiple image model using TravelImage related to TravelPost,
+the images field is no longer a single ImageField — it's now a related set.
+
+<img src="{{post.images.url}}" class="card-img-top" height="350rem">
+                change this path to this path
+<img src="{{ post.images.first.image.url }}" class="card-img-top" height="350rem">
+
+** post.images.first gives the first TravelImage object related to the post.
+    .image.url accesses the actual image URL
+
+------------------------------------ gallery ----------------------------------------------
+
+step1: After i want images seprate then i create a file name as gallery.html
+
+step2: Write down  logic in views
+        def Gallery(request):
+            images = TravelImage.objects.only(images).order_by('-id')
+            return render(request,"blog/gallery.html",{'images':images})
+
+step 3: write url in urls.py
+
+step 4: fill data from views
+
+<div class="row">
+    {% for image in images %} --> for Loop through every image from all posts.
+    <div class="col-md-6 col-lg-4 my-3 d-flex justify-content-center">
+        <div class="card h-100 shadow" style="width: 25rem;">
+            <a href="{% url 'post_detail' image.post.pk %}"> --> Links each image to its respective
+                                                                 post’s detail page using image.post.pk.
+                <img src="{{image.images.url}}"
+                     class="card-img-top shadow" style="height: 340px;object-fit: cover;">
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+--------------------------------------- video -------------------------------------------------
+
+# Video
+
+-> To add an optional video to blog posts but its not compulsory
+
+ step1: Add a video field in TravelPost model
+ video = models.FileField(upload_to="videos/", blank=True, null=True)  # optional
+   --> blank=True, null=True makes the video optional.
+
+step 2: Update post_form.html to allow video upload:
+
+<div class="mb-3">
+    <label class="form-label">Upload Video</label>
+    <input type="file" class="form-control" id="video" name="video" accept="video/*">
+</div>
+
+step 3: Update View
+In Post_blog view, handle the uploaded video:
+
+video = request.FILES.get("video")
+
+        try:
+            post = TravelPost.objects.create(
+                title= title,
+                destination = destination,
+                date = date,
+                description = description,
+                video = video
+
+step 4:  Display Video in post_detail.html
+
+{% if post_d.video %}
+        <video controls width="100%" class="my-4 rounded shadow">
+            <source src="{{ post_d.video.url }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        {% endif %}
+
+step 5: add video on header in index.html
+
+<li class="nav-item ms-2">
+    <a class="nav-link active custom-link" href="{% url 'video' %}">Video</a>
+</li>
+
+step6: cerate url for video
+path('video/',Video,name="video"),
+
+step 7: create a view for video
+
+def Video(request):
+    video = TravelPost.objects.only('video').order_by('-id')
+    return render(request,"blog/video.html",{'video':video})
+
+step 8: create a video page name as video.html
+
+<div class="row">
+    {% for vdo in video %}
+    {% if vdo.video %}    -> use if condition, because it take place for every video but video is not compulsory for every user
+    <div class="col-md-4 col-lg-3 my-4 mx-5">
+        <video controls width="100%" class="my-4 rounded shadow">
+            <source src="{{vdo.video.url}}" type="video/mp4">
+            Your browser does not support video
+        </video>
+    </div>
+
+    {% endif %}
+    {% endfor %}
+</div>
+
+===================================================================================
+
+# i did some changes at front end add back ground colour and apply css to header
+
+==================================== signin ==========================================================
+
+# signin
+
+step1: cerate a hmtml file name as signin.html
+
+{% extends 'blog/index.html' %}
+{% block static %} Travel Blog-Signin {% endblock %}
+
+{% load static %}
+{% block content %}
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <h3 class="text-center mb-4">Create Account</h3>
+                {% include 'blog/message.html' %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label"> Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Sign In</button>
+                    <p class="mt-3 text-center">Already have an account? <a href="{% url 'login' %}">Login</a> </p>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+step2: create url
+
+step3: then write views
+
+        import inbuilt model name as USER
+
+        from django.contrib.auth.models import User
+
+def Signin(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        password2 = request.POST.get("password2")
+
+        if User.objects.filter(username=username).exists():
+            messages.warning(request,"Username already exists..!")
+            return redirect('signin')
+
+        if User.objects.filter(email=email).exists():
+            messages.warning(request,"Email already exists..!")
+            return redirect('signin')
+
+        if password != password2:
+            messages.warning(request,"Password doesn't match..!")
+            return redirect('signin')
+
+        user = User(username=username,email=email)
+
+        user.set_password(password)
+        user.save()
+
+        return redirect('login')
+
+    return render(request,"blog/signin.html")
+
+---------------------------------------- login -------------------------------------------------
+
+# login
+
+step1: create html file name as login.html
+step2: cerate url
+path('signin/',Signin,name="signin"),
+
+step3: write views
+
+import inbult authenticate, login logout --> from django.contrib.auth.models import User
+
+def Login(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(request,username=username,password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+
+        else:
+            messages.warning(request,"Invalid username and password ")
+            return redirect('login')
+
+    return render(request,"blog/login.html")
+
+# logout
+
+step1: write url
+step2: write view
+def Logout(request):
+    logout(request)
+    return redirect('login')
+
+------------------------------------------ message ------------------------------------------------
+# then i want to messages
+
+step1: import messages in views -> from django.contrib import messages
+
+step2: create a html file name as message.html and write below code
+
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+step4: in views.py file then where you want to come this message like as
+          messages.warning(request,"Password doesn't match..!")
+
+step5: write below code on that page where you to display these message I want this message on signin page
+        under create account name
+
+        <h3 class="text-center mb-4">Create Account</h3>
+                {% include 'blog/message.html' %} --> like as
+
+
+----------------------------------- login logout button on navbar ----------------------------------------
+
+
+step1: then create one button at navbar ther i show user are login or not by using below code
+    {% if user.is_authenticated %}
+        <a href="#" class="btn btn-outline-success">{{user.username}}</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn btn-outline-warning">Login</a>
+
+    {% endif %}
+
+
+----------------------------- brings dropdown on this button -------------------------
+
+
+{% if user.is_authenticated %}
+<div class="dropdown">
+    <button class="btn btn-outline-success dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        {{ user.username }}
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="userDropdown">
+        <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+        <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+</div>
+{% else %}
+<div class="dropdown">
+    <button class="btn btn-outline-warning dropdown-toggle" type="button" id="guestDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        Account
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="guestDropdown">
+        <li><a class="dropdown-item" href="{% url 'login' %}">Login</a></li>
+        <li><a class="dropdown-item" href="{% url 'signup' %}">Sign Up</a></li>
+    </ul>
+</div>
+{% endif %}
+
+
+step2: did some changes at home views for send data from views to index pages
+
+def Index(request):
+    user = request.user
+    return render(request, "blog/index.html",{"user":user})
+
+
+-------------------------------------------- login required --------------------------------------------
+
+# login required
+step1: import inbult login required
+     --> from django.contrib.auth.decorators import login_required
+
+step2: settings.py write
+
+LOGIN_URL = 'login' --> So you don't have to pass login_url='login' every time.
+
+step3: in views.py write on who field you want required
+
+@login_required()
+def Post_form(request):
+    return render(request, "blog/post_form.html")
+
+
+# ----------------------------------------- add comment ----------------------------------------
+
+
+ step1: create a new model name as Comments
+        and import inbuilt user model
+
+ class Comment(models.Model):
+    post = models.ForeignKey(TravelPost,on_delete=models.CASCADE,related_name='comments')
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    content = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.post.title}"
+
+step 2: create inbuilt django form at app level
+
+from django import forms
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    from django import forms
+from .models import Comment
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        labels = {
+            'content': '',
+        }
+                                        # here start a bootstrap
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control',  # Bootstrap input style
+                'rows': 3,
+                'placeholder': 'Write your comment here...'
+            }),
+        }
+
+
+step 3: I want comment in post_details page because of why i need to update the post_detail view
+
+
+@login_required()
+def Post_detail(request, pk):
+    post_d = get_object_or_404(TravelPost, pk=pk)
+    comments = post_d.comments.all().order_by('-date')
+    form = CommentForm()
+
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        comment = form.save(commit=False)
+        comment.post = post_d
+        comment.user = request.user
+        comment.save()
+        messages.success(request,"Comment added successfully...!")
+        return redirect("post_detail",pk=post_d.pk)
+
+    return render(request, "blog/post_detail.html", {
+        'post_d': post_d,
+        'comments': comments,
+        'form': form
+    })
+
+
+step 4: I allow to delete comment view then write the delete view
+
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    if request.user == comment.user or request.user.is_superuser:
+        comment.delete()
+        messages.success(request, "Comment deleted.")
+    else:
+        messages.warning(request, "You don't have permission to delete this comment.")
+    return redirect('post_detail', pk=comment.post.pk)
+
+step5: add below code in post_detail page where you want to show comment
+
+ <section class="">
+        <hr>
+        <h4>Comments</h4>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Comment</button>
+        </form>
+
+        <div class="mt-4">
+            {% for comment in comments %}
+            <div class="border p-2 mb-2 rounded bg-white shadow-sm">
+                <strong>{{ comment.user.username }}</strong> <span class="text-muted">{{ comment.date }}</span>
+
+                <p>{{ comment.content | linebreaks }}</p>
+
+                {% if comment.user == request.user or request.user.is_superuser %}
+                <a href="{% url 'delete_comment' comment.id %}"
+                   onclick="return confirm('Are you want to delete comment?')"
+                   class="btn btn-sm btn-danger">Delete</a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p>No comments yet.</p>
+            {% endfor %}
+        </div>
+ </section>
+
+step 6: create url for delete comments
+
+path('Delete_comment<int:comment_id>/',Delete_comment,name="delete_comment")
+
+step 7: then add alert delete conformation by use below code on delete button in html
+
+onclick="return confirm('Are you want to delete comment?')"
+
+------------------------------------ likes -----------------------------------------
+step1: first of all add likes field in TravelPost model and create a function for count a likes
+
+likes = models.ManyToManyField(User, related_name='liked_posts', blank=True)
+
+    def total_likes(self):
+        return self.likes.count()
+
+step2: create a view for like and unlikes
+
+@login_required
+def Like_post(request, pk):
+    post = TravelPost.objects.get(pk=pk)
+    if request.user in post.likes.all():
+        post.likes.remove(request.user)
+    else:
+        post.likes.add(request.user)
+    return redirect('post_detail', pk=pk)
+
+step3: write a url
+path('like/<int:pk>/',Like_post, name='like_post'),
+
+step4: then i had to update the template
+<form action="{% url 'like_post' post_d.pk %}" method="POST">
+    {% csrf_token %}
+    {% if user in post_d.likes.all %}
+        <button class="btn btn-danger" type="submit">❤️ Unlike ({{ post_d.total_likes }})</button>
+    {% else %}
+        <button class="btn btn-outline-danger" type="submit">🤍 Like ({{ post_d.total_likes }})</button>
+    {% endif %}
+</form>
+
+# ---------------------------------------- my profile page ----------------------------------------------
+step1: create a separate model name as UserProfile
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
+    profile_pic = models.ImageField(upload_to='profile_pic/',default="Imgs/user_profile.png")
+
+    def __str__(self):
+        return self.user.name
+
+step2: add one field in in TravelPost model on top
+user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts',default=1)
+
+step3: Update Post_blog view to include the user when creating the post
+
+try:
+post = TravelPost.objects.create(
+    user=request.user,  # add this
+    title=title,
+    destination=destination,
+    date=date,
+    description=description,
+    video=video
+)
+
+step4: create a signals.py file at app level this file create a profile automatic when user sign in or
+       create an account.
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.models import User
+from .models import UserProfile
+
+@receiver(post_save, sender=User)
+def create_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+step5: create a view for profile
+@login_required()
+def Profile(request):
+    user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    my_posts = TravelPost.objects.filter(user=user).order_by('-id')
+
+    return render(request,"blog/profile.html",{
+        'user':user,
+        'user_profile':user_profile,
+        'my_posts':my_posts,
+    })
+
+step6: create view for delete post
+@login_required()
+def Delete_post(request, pk):
+    post = get_object_or_404(TravelPost, pk=pk)
+
+    if post.user == request.user:
+        post.delete()
+        messages.success(request, "Post deleted successfully!")
+    else:
+        messages.warning(request, "You don't have permission to delete this post.")
+
+    return redirect('profile')
+
+
+step7: create view for update profile photo
+@login_required
+def Edit_profile(request):
+    user = request.user
+    # user = request.user
+    user_profile = UserProfile.objects.get(user=user)
+    # Ensure the user has a profile
+    profile, created = UserProfile.objects.get_or_create(user=user)
+
+    if request.method == 'POST':
+        profile_pic = request.FILES.get('profile_pic')
+        if profile_pic:
+            profile.profile_pic = profile_pic
+            profile.save()
+            messages.success(request, "Profile picture updated!")
+        return redirect('profile')
+
+    return render(request, 'blog/edit_profile.html',{'user_profile':user_profile})
+
+step 8: create a html page for profile.html
+{% extends 'blog/index.html' %}
+{% block static %} Travel Blog-MY posts {% endblock %}
+
+{% load static %}
+{% block content %}
+
+<div class="container-fluid mt-4">
+    {% include 'blog/message.html' %}
+    <div class="text-center">
+
+        <img src="{{ user_profile.profile_pic.url }}" class="rounded-circle" width="150" height="150">
+
+        <h3 class="mt-3">{{user.username}}</h3>
+        <a href="{% url 'edit_profile' %}">Edit Profile Picture</a>
+    </div>
+        <div class="row">
+            {% for post in my_posts %}
+            <div class="col-md-6 col-lg-4 mb-4 mt-3">
+                <div class="card h-100 shadow">
+                    <img src="{{ post.images.first.images.url }}" class="card-img-top" height="350rem">
+                    <div class="card-body">
+                        <h5 class="card-title">{{post.title}}</h5>
+                        <p class="card-text"><strong>{{post.destination}}</strong> {{post.date}}</p>
+                        <p class="card-text"> {{post.description |truncatewords:20}}</p>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn btn-outline-primary">Read more</a>
+                        <a href="{% url 'delete_post' post.pk %}" class="btn btn-outline-danger ms-3"
+                        onclick="return confirm('Are you want to delete post?')">Delete</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <h3 class="text-muted text-center mt-3"> You haven't posted anything yet. </h3>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}
+
+step9: create an another html page for edit profile photo
+{% extends "blog/index.html" %}
+
+{% block static %} Travel blog-edit profile {% endblock %}
+
+{% load static %}
+
+{% block content %}
+<h2>Edit Profile</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  <input type="file" name="profile_pic">
+  <button type="submit" style="color:blue;">Upload</button>
+</form>
+{% endblock %}
+
+step 10: create all urls of three pages
+
+----------------------------------- profile image error fixing ---------------------------
+step1: update the model and write below method
+
+profile_pic = models.ImageField(upload_to='profile_pic/',null=True,blank=True,default='profile_pic/user_profile.png')
+
+    def __str__(self):
+        return self.user.name
+
+    @property
+    def get_profile_pic_url(self):
+        if self.profile_pic:
+            return self.profile_pic.url
+        return '/media/profile_pic/user_profile.png'
+
+step2:did some changes in index file
+{% if user_profile %}
+
+             # before  that I use there  <img src="{{ user_profile.prifile_pic.url }}">
+<img src="{{ user_profile.get_profile_pic_url }}" class="rounded-circle" width="35"
+     height="35">
+{% else %}
+<img src="{% static 'Imgs/user_profile.png' %}" class="rounded-circle" width="35"
+     height="35">
+{% endif %}
+
+step3: did same changes in profile file html
+
+{% if user_profile %}
+<img src="{{ user_profile.get_profile_pic_url }}" class="rounded-circle" width="135"
+     height="135">
+{% else %}
+<img src="{% static 'Imgs/user_profile.png' %}" class="rounded-circle" width="135"
+     height="135">
+{% endif %}
+
+# ------------------------------ contact us page -----------------------------------------
+step1:  create a html page and there i develop a from
+step2: develop a model depends on html contat form
+step3: in views import a contact model
+step4: in viwes.py I did developed a business logic show in below code
+def Contact(request):
+    user=request.user
+    user_profile, created = UserProfile.objects.get_or_create(user=user)
+
+    if request.method == "POST":
+        fullname = request.POST.get("fullname")
+        email = request.POST.get("email")
+        mobile = request.POST.get("mob")
+        message = request.POST.get("msg")
+
+        contact = ContactModel(
+            fullname = fullname,
+            email = email,
+            mobile = mobile,
+            message =message
+        )
+
+        try:
+            contact.save()
+            send_mail(
+                subject='Your message submitted to Travel Blog',
+                message=f'Hello {fullname},\n\n Thank you for contact Us. \n '
+                        f'Your message is successfully submitted. \n\n Thanks and regards..!',
+
+                from_email='shubhampati712@gmail.com',
+                recipient_list=[email],
+                fail_silently=False,
+            )
+
+            messages.success(request, "Your message is submitted.")
+            return render(request,"blog/contact.html",{"user_profile":user_profile})
+        except:
+            messages.error(request, "Something went wrong.")
+            return render(request,"blog/contact.html",{"user_profile": user_profile})
+
+    return render(request,"blog/contact.html",{"user_profile": user_profile})
+
+step5: create a url for the contact page
+
+step6: then I got an a error that is "UserProfile.DoesNotExist". That crashes your view, and Django shows
+      an error page (like the one you're seeing: "UserProfile matching query does not exist").
+
+      I fixed that error by using this line, in every views
+      user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+      .get() means - only fetches existing objects.
+      .get_or_create() - Trying to .get() the object (like normal) If not found, it automatically creates a new one
+
+
+----------------- delete the image path from database as well as entry (means pysharm)-----------------
+
+step 1: write your logic in Travel image model for delete path
+
+class TravelImage(models.Model):
+    post = models.ForeignKey(TravelPost,on_delete=models.CASCADE,related_name='images')
+    images = models.ImageField(upload_to="photos")
+
+    def delete(self, *args, **kwargs):
+        if self.images and os.path.isfile(self.images.path):
+            os.remove(self.images.path)
+        super().delete(*args, **kwargs)
+
+    def __str__(self):
+        return f"Image for Post: {self.post.title}"
+
+
+step 2: In signal to delete related image files when a post is deleted.
+
+# blog/signals.py
+
+import os
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+from .models import TravelPost, TravelImage
+
+@receiver(pre_delete, sender=TravelPost)
+def delete_post_images(sender, instance, **kwargs):
+    for image in instance.images.all():
+        if image.images and os.path.isfile(image.images.path):
+            os.remove(image.images.path)  # Delete the image file
+
+step3: check the apps are connect the signals or not
+
+****** How it works *****
+Now what happens?
+When you call:
+
+post = TravelPost.objects.get(id=some_id)
+post.delete()
+
+All related TravelImage instances are deleted (because of on_delete=models.CASCADE)
+
+Their image files are also deleted automatically by the signal

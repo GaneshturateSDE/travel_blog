@@ -1,0 +1,58 @@
+# 🔐 Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 🔐 Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# 🔐 Django
+*.log
+db.sqlite3
+*.sqlite3
+
+# 🔐 Media Files (user uploads)
+/media/photos/
+/media/profile_pic/
+/media/videos/
+!/media/.gitkee
+# 🔐 Static Images (your custom folder)
+static/Imgs/
+
+# 🔐 Static collected files
+staticfiles/
+
+# 🔐 Environment Variables
+.env
+
+# 🔐 VS Code / IDE
+.vscode/
+.idea/
+
+# 🔐 OS Files
+.DS_Store
+Thumbs.db
+
+# 🔐 Migrations cache (optional keep migrations if needed)
+# */migrations/*
+# !*/migrations/__init__.py
+
+# 🔐 Node (if using later)
+node_modules/
+
+# 🔐 Build / dist
+dist/
+build/
+
+# 🔐 Coverage / test
+.coverage
+htmlcov/
+
+# 🔐 Temporary files
+*.swp
+*.swo
+
+

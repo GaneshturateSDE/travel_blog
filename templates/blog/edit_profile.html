@@ -1,0 +1,70 @@
+{% extends "blog/index.html" %}
+{% load static %}
+
+{% block static %} Travel blog-edit profile {% endblock %}
+
+{% block content %}
+
+<div class="bg-blue-50 min-h-screen flex items-center justify-center px-4">
+
+    <div class="bg-white shadow-xl rounded-2xl p-6 md:p-10 w-full max-w-md text-center">
+
+        <!-- Title -->
+        <h2 class="text-2xl font-bold text-blue-700 mb-6">
+            Edit Profile
+        </h2>
+
+        <!-- Profile Preview -->
+        <div class="mb-6">
+            <img id="preview"
+                 src="{% static 'Imgs/user_profile.png' %}"
+                 class="w-28 h-28 mx-auto rounded-full object-cover border-4 border-blue-500 shadow-md">
+        </div>
+
+        <!-- Form -->
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <!-- File Input -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Upload Profile Picture
+                </label>
+                <input type="file"
+                       name="profile_pic"
+                       accept="image/*"
+                       onchange="previewImage(event)"
+                       class="w-full text-sm border border-gray-300 rounded-lg p-2 cursor-pointer focus:ring-2 focus:ring-blue-500 focus:outline-none">
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-4">
+                <button type="submit"
+                        class="w-full bg-blue-600 text-white py-2 rounded-lg shadow hover:bg-blue-700 transition">
+                    Upload
+                </button>
+
+                <a href="javascript:history.back()"
+                   class="w-full text-center border border-gray-300 py-2 rounded-lg hover:bg-gray-100 transition">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Image Preview Script -->
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById('preview');
+        if (input.files && input.files[0]) {
+            preview.src = URL.createObjectURL(input.files[0]);
+        }
+    }
+</script>
+
+{% endblock %}

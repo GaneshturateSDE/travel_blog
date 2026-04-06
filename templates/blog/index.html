@@ -1,0 +1,230 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block static %}Travel Blog{% endblock %}</title>
+    <link rel="icon" href="{% static 'Imgs/earth.png' %}" />
+    <!-- Tailwind ONLY -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <style>
+      @keyframes spinSlow {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .animate-spin-slow {
+        animation: spinSlow 20s linear infinite;
+      }
+    </style>
+  </head>
+
+  <body class="bg-blue-50 min-h-screen flex flex-col">
+    <!-- NAVBAR -->
+    <nav class="bg-white shadow-sm fixed w-full z-50">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo -->
+          <div class="flex items-center space-x-2">
+            <!-- Rotating Earth -->
+            <div
+              class="w-10 h-10 rounded-full overflow-hidden shadow-md animate-spin-slow"
+            >
+              <img
+                src="{% static 'Imgs/earth.png' %}"
+                class="w-full h-full object-cover"
+              />
+            </div>
+
+            <!-- Logo -->
+            <h2 class="text-2xl font-bold text-blue-600">
+              <a href="{% url 'home' %}" class="block">TravelBlog</a>
+            </h2>
+          </div>
+
+          <!-- Desktop Menu -->
+          <div class="hidden md:flex space-x-8 text-gray-700 font-medium">
+            <a href="{% url 'home' %}" class="hover:text-blue-600">Home</a>
+            <a href="{% url 'blogs' %}" class="hover:text-blue-600">Blogs</a>
+            <a href="{% url 'gallery' %}" class="hover:text-blue-600"
+              >Gallery</a
+            >
+            <a href="{% url 'video' %}" class="hover:text-blue-600">Video</a>
+            <a href="{% url 'about' %}" class="hover:text-blue-600">About</a>
+            <a href="{% url 'contact' %}" class="hover:text-blue-600"
+              >Contact</a
+            >
+          </div>
+
+          <!-- Right Section -->
+          <div class="flex items-center space-x-3">
+            {% if user.is_authenticated %}
+            <a
+              href="{% url 'post_form' %}"
+              class="hidden md:block bg-blue-400 text-white px-6 py-2 rounded-md hover:bg-blue-400"
+            >
+              Post
+            </a>
+            <div class="relative">
+              <button
+                onclick="toggleDropdown()"
+                class="flex items-center space-x-2"
+              >
+                <img
+                  src="{% if request.user.is_authenticated %}
+            {% if request.user.profile %}
+                {{ request.user.profile.get_profile_pic_url }}
+            {% else %}
+                {% static 'Imgs/user_profile.png' %}
+            {% endif %}
+          {% else %}
+            {% static 'Imgs/user_profile.png' %}
+          {% endif %}"
+                  class="w-9 h-9 rounded-full border"
+                />
+                <span class="text-sm">{{ user.username }}</span>
+              </button>
+
+              <!-- Dropdown -->
+              <div
+                id="dropdown"
+                class="hidden absolute right-0 mt-2 w-40 bg-white border rounded-md shadow-md"
+              >
+                <a
+                  href="{% url 'profile' %}"
+                  class="block px-4 py-2 hover:bg-blue-50"
+                  >Profile</a
+                >
+                <a
+                  href="{% url 'logout' %}"
+                  class="block px-4 py-2 hover:bg-blue-50"
+                  >Logout</a
+                >
+              </div>
+            </div>
+            {% else %}
+            <a href="{% url 'login' %}" class="text-blue-600 hover:underline"
+              >Login</a
+            >
+            <a
+              href="{% url 'signin' %}"
+              class="bg-blue-600 text-white px-4 py-2 rounded-md"
+              >Sign Up</a
+            >
+            {% endif %}
+
+            <!-- Mobile Button -->
+            <button onclick="toggleMenu()" class="md:hidden text-2xl">
+              ☰
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div
+        id="mobileMenu"
+        class="hidden md:hidden bg-white border-t px-4 py-3 space-y-2"
+      >
+        <a href="{% url 'home' %}" class="block">Home</a>
+        <a href="{% url 'blogs' %}" class="block">Blog</a>
+        <a href="{% url 'gallery' %}" class="block">Gallery</a>
+        <a href="{% url 'contact' %}" class="block">Contact</a>
+        <a href="{% url 'post_form' %}" class="block text-blue-600">Post</a>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="flex-grow pt-20 px-4 md:px-10">
+      {% block content %} {% endblock %}
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-white border-t mt-10">
+      <div class="max-w-6xl mx-auto px-6 py-10 text-gray-600">
+        <!-- Brand + Description -->
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-blue-600 mb-2">TravelBlog 🌍</h2>
+          <p class="max-w-2xl mx-auto text-sm">
+            TravelBlog is a platform where explorers share their journeys,
+            experiences, and stories. Discover new destinations, get inspired,
+            and start your own adventure today.
+          </p>
+        </div>
+
+        <!-- Info Sections -->
+        <div class="grid md:grid-cols-3 gap-8 text-center md:text-left">
+          <!-- About -->
+          <div>
+            <h4 class="font-semibold text-blue-600 mb-2">About Us</h4>
+            <p class="text-sm">
+              We aim to connect travelers around the world by sharing real
+              experiences, travel tips, and inspiring stories.
+            </p>
+          </div>
+
+          <!-- Mission -->
+          <div>
+            <h4 class="font-semibold text-blue-600 mb-2">Our Mission</h4>
+            <p class="text-sm">
+              To inspire people to explore the world and document their journeys
+              in a meaningful way.
+            </p>
+          </div>
+
+          <!-- Contact -->
+          <div>
+            <h4 class="font-semibold text-blue-600 mb-2">Contact</h4>
+            <p class="text-sm">
+              📧 support@travelblog.com <br />
+              🌍 Available worldwide <br />
+              📱 Follow us for updates
+            </p>
+          </div>
+        </div>
+
+        <!-- Social Icons -->
+        <div class="flex justify-center space-x-6 mt-8 text-blue-600 text-lg">
+          <i class="fa-brands fa-facebook"></i>
+          <i class="fa-brands fa-instagram"></i>
+          <i class="fa-brands fa-twitter"></i>
+          <i class="fa-brands fa-youtube"></i>
+        </div>
+      </div>
+
+      <!-- Bottom -->
+      <div class="text-center py-4 text-sm text-gray-500 border-t">
+        © 2026 TravelBlog. All rights reserved.
+      </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+      function toggleDropdown() {
+        document.getElementById("dropdown").classList.toggle("hidden");
+      }
+
+      function toggleMenu() {
+        document.getElementById("mobileMenu").classList.toggle("hidden");
+      }
+
+      // Close dropdown on outside click
+      window.addEventListener("click", function (e) {
+        const dropdown = document.getElementById("dropdown");
+        if (!e.target.closest(".relative")) {
+          dropdown?.classList.add("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>
